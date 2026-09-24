@@ -10,9 +10,10 @@ Answer **one** review round posted by `/review-mr`: every finding gets fixed or 
 decline, then one response comment. "MR" means a GitLab merge request or a GitHub pull
 request.
 
-**Tracker:** if `docs/agents/issue-tracker.md` exists, follow it. Otherwise infer it from
-`git remote get-url origin`: `github.com` means GitHub (`gh`), any other host means GitLab
-(`glab`, authenticated for that host: `glab auth status`). If neither works, stop and ask.
+**Tracker:** if the project's `AGENTS.md` has a line `Issue tracker: <project URL>`, issues
+live in that project (`-R <owner/project>` on issue commands). Otherwise use the `origin`
+remote: `github.com` means GitHub (`gh`), any other host GitLab (`glab`; check
+`glab auth status`). If neither works, stop and ask.
 
 Never merge, never force-push, never rewrite commits the reviewer already saw.
 
@@ -49,7 +50,7 @@ don't guess: add the label `needs-human`, say why in the response, and stop afte
 
 ## Step 3: Fix
 
-Fix test-first where behaviour changes (`/tdd` if installed). Run the full test suite and
+Fix test-first where behaviour changes: a failing test at a public seam, then the fix. Run the full test suite and
 the linters as documented in `AGENTS.md`; everything must pass. Commit using the repo's
 commit convention (e.g. `fix: address review round <r>`), then `git push` (no force).
 

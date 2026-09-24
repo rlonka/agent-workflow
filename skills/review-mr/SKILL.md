@@ -11,9 +11,10 @@ verdict and the limit live in the MR itself (hidden markers in comments), so any
 in any session reaches the same conclusion. "MR" means a GitLab merge request or a GitHub
 pull request.
 
-**Tracker:** if `docs/agents/issue-tracker.md` exists, follow it. Otherwise infer it from
-`git remote get-url origin`: `github.com` means GitHub (`gh`), any other host means GitLab
-(`glab`, authenticated for that host: `glab auth status`). If neither works, stop and ask.
+**Tracker:** if the project's `AGENTS.md` has a line `Issue tracker: <project URL>`, issues
+live in that project (`-R <owner/project>` on issue commands). Otherwise use the `origin`
+remote: `github.com` means GitHub (`gh`), any other host GitLab (`glab`; check
+`glab auth status`). If neither works, stop and ask.
 
 You review; you don't fix. Never push to the MR branch, never merge, never approve through
 the platform's approval button: the verdict is the comment and the label.
@@ -55,8 +56,10 @@ point of this loop is a second pair of eyes.
 
 ## Step 3: Review
 
-Review along two separate axes, the way `/review` does (use it, or its sub-agent
-approach, if your tool has it):
+Review along two **separate** axes. If your tool has sub-agents, run one per axis in
+parallel so they don't influence each other; otherwise do them one after the other and
+report them separately, without merging or re-ranking findings across axes. A change
+can follow every standard and still implement the wrong thing, or the reverse:
 
 - **Spec:** is every acceptance criterion met? Anything missing, wrong, or not asked for?
 - **Standards:** does the code follow the repo's documented conventions? Skip anything a
@@ -91,9 +94,10 @@ keep its format exact:
 
 ### Spec (#<issue>)
 - <criterion>: met | not met (<why>)
-
-### Findings
 - **R<r>.1** `blocker` `path/file.py:42`: <what is wrong and why>. Suggestion: <how>.
+
+### Standards
+- **R<r>.2** `should-fix` `path/file.py:88`: <rule broken, where it's documented>. Suggestion: <how>.
 
 ### Previous round
 - **R<r-1>.2**: fixed | declined, accepted | still open: <why>
@@ -110,3 +114,5 @@ Omit empty sections. Then set the label:
 Switch back to the branch you started on. Tell the user the verdict and the next step:
 `/address-review <n>` in the implementer's agent, `/await-ci <n>` after an approve, or a
 human decision after `needs-human`.
+
+The two-axis review is based on `review` from mattpocock/skills (MIT); see [NOTICE.md](NOTICE.md).

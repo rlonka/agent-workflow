@@ -1,12 +1,13 @@
 # agent-workflow
 
-Skills for an issue → merge request → cross-agent review → CI loop with **Claude Code,
-Codex and OpenCode**, on **GitLab or GitHub**. One agent implements, a different agent
-reviews, the loop is capped at a fixed number of rounds, and **merging stays with a human**.
+Self-contained skills for a plan → issue → merge request → cross-agent review → CI loop
+with **Claude Code, Codex and OpenCode**, on **GitLab or GitHub**. One agent implements,
+a different agent reviews, the loop is capped at a fixed number of rounds, and **merging
+stays with a human**. No other skill set and no per-repository setup is required.
 
 ```
 PLAN                     IMPLEMENT                 REVIEW LOOP (max 3 rounds)          FINISH
-/grill-to-issues         /implement-issue #12      /review-mr !34      ← agent B       /await-ci !34
+/plan-to-issues          /implement-issue #12      /review-mr !34      ← agent B       /await-ci !34
   interview, glossary,     branch, TDD, tests,       findings + verdict                  waits for the pipeline
   ADRs → docs MR           commit, push,           /address-review !34 ← agent A         green → ready-to-merge
   PRD (optional)           MR "Closes #12"           fix or decline, push                MERGE = HUMAN
@@ -15,23 +16,38 @@ PLAN                     IMPLEMENT                 REVIEW LOOP (max 3 rounds)   
 
 ## Skills
 
-| Skill | Run by | What it does |
-|---|---|---|
-| [`grill-to-issues`](skills/grill-to-issues/SKILL.md) | you + any agent | Interview in rounds, write glossary and ADRs, open a docs MR, optional PRD, publish issues |
-| [`implement-issue`](skills/implement-issue/SKILL.md) | implementer (agent A) | Issue → branch → test-first implementation → checks → commit, push → MR that closes the issue |
-| [`review-mr`](skills/review-mr/SKILL.md) | reviewer (agent B) | One review round: spec and standards, findings with IDs and severities, verdict |
-| [`address-review`](skills/address-review/SKILL.md) | implementer (agent A) | Fix or decline each finding with a reason, push, respond |
-| [`await-ci`](skills/await-ci/SKILL.md) | implementer (agent A) | Wait for the pipeline; green → `ready-to-merge`; red → fix, at most 2 attempts |
+| Skill | Alias | Run by | What it does |
+|---|---|---|---|
+| [`plan-to-issues`](skills/plan-to-issues/SKILL.md) | `wf-plan` | you + any agent | Interview in rounds, write glossary and ADRs, open a docs MR, optional PRD, publish issues |
+| [`implement-issue`](skills/implement-issue/SKILL.md) | `wf-implement` | implementer (agent A) | Issue → branch → test-first implementation → checks → commit, push → MR that closes the issue |
+| [`review-mr`](skills/review-mr/SKILL.md) | `wf-review` | reviewer (agent B) | One review round: spec and standards, findings with IDs and severities, verdict |
+| [`address-review`](skills/address-review/SKILL.md) | `wf-respond` | implementer (agent A) | Fix or decline each finding with a reason, push, respond |
+| [`await-ci`](skills/await-ci/SKILL.md) | `wf-ship` | implementer (agent A) | Wait for the pipeline; green → `ready-to-merge`; red → fix, at most 2 attempts |
+| [`domain-docs`](skills/domain-docs/SKILL.md) | `wf-domain` | you + any agent | Work on the glossary (`CONTEXT.md`) and ADRs without planning issues |
 
-These skills build on [mattpocock/skills](https://github.com/mattpocock/skills):
-`grill-to-issues` chains `grilling`, `domain-modeling`, `to-prd` and `to-issues`;
-`implement-issue` uses `tdd`; `review-mr` follows `review`. For a small, clear task,
-skip the planning step and write the issue yourself.
+The `wf-*` aliases name the skills by workflow phase; each one just follows the skill it
+points to. For a small, clear task, skip planning and write the issue yourself.
 
 Every skill runs only when you invoke it, and you run each step yourself, typically
 alternating between two tools (e.g. Claude Code implements, Codex reviews). The loop is
 deliberately manual: you see every round, and the state lives in the MR, so nothing
 depends on an agent remembering where it was.
+
+## Conventions the skills rely on
+
+- **Tracker:** inferred from the `origin` remote: `github.com` means GitHub (`gh`), any
+  other host GitLab (`glab`). If the issues live in a different project than the code,
+  add one line to the project's `AGENTS.md`:
+  `Issue tracker: https://code.example.com/group/tracker`.
+- **Domain docs:** `CONTEXT.md` (glossary) and `docs/adr/` (decisions) at the repo root,
+  or a `CONTEXT-MAP.md` pointing to one `CONTEXT.md` per context in a monorepo. Created
+  lazily by `plan-to-issues` and `domain-docs`. For agents to read them outside these
+  skills too, add a line to your global `AGENTS.md`, for example:
+  "If the repo has `CONTEXT.md` or `docs/adr/`, read the relevant parts before exploring
+  code, use the glossary's terms, and call out anything that contradicts an ADR."
+- **Labels:** `ready-for-agent` (issue ready), `prd` (PRD issue), `agent-approved`
+  (review passed), `ready-to-merge` (CI green), `needs-human` (limit reached or a decision
+  only a human can make; all skills stop).
 
 ## State: kept in the MR, not in the agent
 
@@ -45,10 +61,6 @@ depends on an agent remembering where it was.
 The markers are HTML comments: invisible in the rendered MR, readable by every agent.
 Each skill recomputes the state from them before acting and refuses out-of-order steps
 (e.g. a second review before the response).
-
-**Labels:** `agent-approved` (review passed), `ready-to-merge` (CI green),
-`needs-human` (round or attempt limit reached, or a decision only a human can make;
-all skills stop).
 
 ## Keeping the merge with a human
 
@@ -65,18 +77,13 @@ The skills never merge, but an instruction is not a guarantee. Two more layers:
 
 ```bash
 npx skills add rlonka/agent-workflow -g
-npx skills add mattpocock/skills -g     # grilling, domain-modeling, to-prd, to-issues,
-                                        # tdd, review, setup-matt-pocock-skills
 ```
 
-`gh` or `glab` must be authenticated for the repository's host. The skills infer the
-tracker from `git remote`: `github.com` means GitHub, any other host GitLab.
+`gh` or `glab` must be authenticated for the repository's host. Install the `wf-*`
+aliases together with the skills they point to.
 
-Once per repository, run `/setup-matt-pocock-skills`. It writes
-`docs/agents/issue-tracker.md`, which `grill-to-issues` requires (it hands over to
-`to-prd` and `to-issues`) and which the other skills follow when present, e.g. when the
-issues live in a different project than the code.
+## Credits and license
 
-## License
-
-[MIT](LICENSE)
+The planning, domain-docs, test-first and two-axis review methods are adapted from
+[mattpocock/skills](https://github.com/mattpocock/skills) (MIT, © Matt Pocock); each
+adapted skill carries a `NOTICE.md` with that license. Everything else: [MIT](LICENSE).

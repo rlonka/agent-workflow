@@ -14,9 +14,10 @@ Never merge, never push to the default branch, never force-push.
 
 ## Setup
 
-- **Tracker:** if `docs/agents/issue-tracker.md` exists, follow it. Otherwise infer it from
-  `git remote get-url origin`: `github.com` means GitHub (`gh`), any other host means GitLab
-  (`glab`, authenticated for that host: `glab auth status`). If neither works, stop and ask.
+- **Tracker:** if the project's `AGENTS.md` has a line `Issue tracker: <project URL>`, issues
+  live in that project (`-R <owner/project>` on issue commands). Otherwise use the `origin`
+  remote: `github.com` means GitHub (`gh`), any other host GitLab (`glab`; check
+  `glab auth status`). If neither works, stop and ask.
 - The working tree must be clean (`git status --porcelain` empty). If not, stop and ask.
 
 | Action | GitLab (`glab`) | GitHub (`gh`) |
@@ -41,15 +42,20 @@ git fetch origin && git switch -c <n>-<short-slug> origin/<default-branch>
 
 ### 3. Agree the seams
 
-List the public interfaces you will test (the seams) and the tests you plan, one line
-each, and confirm them with the user.
+A **seam** is the public boundary where you observe behaviour without reaching inside.
+Tests live only at seams. List the seams and the tests you plan, one line each, and
+confirm them with the user; don't write a test at an unconfirmed seam. Prefer existing
+seams, as high up and as few as possible.
 
 ### 4. Implement test-first
 
-Use `/tdd` if it is installed. Otherwise: one failing test, the minimum code to pass it,
-repeat. Test behaviour through public interfaces, not internals. Keep the change to what
-the issue asks for; note anything else you notice for the MR description instead of
-fixing it.
+Red → green, one **vertical slice** at a time: one failing test at an agreed seam, the
+minimum code to pass it, repeat. Let each cycle inform the next; don't write all the
+tests first. Refactoring is not part of the loop. What makes a test worth keeping, and
+when to mock: [TESTS.md](TESTS.md).
+
+Keep the change to what the issue asks for; note anything else you notice for the MR
+description instead of fixing it.
 
 ### 5. Verify
 
@@ -60,7 +66,8 @@ acceptance criterion; if one can't be met, stop and tell the user why.
 ### 6. Commit and push
 
 Commit using the repo's commit convention (Conventional Commits unless the repo says
-otherwise), referencing the issue. Push the branch: `git push -u origin <branch>`.
+otherwise), referencing the issue (`owner/project#n` if the issues live in another
+project). Push the branch: `git push -u origin <branch>`.
 
 ### 7. Open the MR
 
@@ -68,7 +75,7 @@ Write the description to a temporary file, then open the MR (commands above) tar
 the default branch. Description template:
 
 ```markdown
-Closes #<n>
+Closes #<n>   (or Closes <owner/project>#<n> if the issues live in another project)
 
 ## What changed
 <2-5 bullets>
@@ -89,3 +96,5 @@ The last line is machine-readable state for the other skills; keep it exactly in
 Report the MR URL and the next step: **run `/review-mr <number>` in a different agent**
 (e.g. Codex if you are Claude Code). A reviewer that wrote the code misses its own
 blind spots.
+
+The test-first rules are based on `tdd` from mattpocock/skills (MIT); see [NOTICE.md](NOTICE.md).
