@@ -69,9 +69,13 @@ npx skills add mattpocock/skills -g     # grilling, domain-modeling, to-prd, to-
                                         # tdd, review, setup-matt-pocock-skills
 ```
 
+`gh` or `glab` must be authenticated for the repository's host. The skills infer the
+tracker from `git remote`: `github.com` means GitHub, any other host GitLab.
+
 Once per repository, run `/setup-matt-pocock-skills`. It writes
-`docs/agents/issue-tracker.md`, which tells every skill whether the repo uses GitLab
-(`glab`) or GitHub (`gh`). Both CLIs must be authenticated for the host.
+`docs/agents/issue-tracker.md`, which `grill-to-issues` requires (it hands over to
+`to-prd` and `to-issues`) and which the other skills follow when present, e.g. when the
+issues live in a different project than the code.
 
 ## License
 

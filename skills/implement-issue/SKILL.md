@@ -14,8 +14,9 @@ Never merge, never push to the default branch, never force-push.
 
 ## Setup
 
-- The repo must have `docs/agents/issue-tracker.md` (it says GitLab or GitHub and how to
-  read issues). If it is missing, stop and tell the user to run `/setup-matt-pocock-skills`.
+- **Tracker:** if `docs/agents/issue-tracker.md` exists, follow it. Otherwise infer it from
+  `git remote get-url origin`: `github.com` means GitHub (`gh`), any other host means GitLab
+  (`glab`, authenticated for that host: `glab auth status`). If neither works, stop and ask.
 - The working tree must be clean (`git status --porcelain` empty). If not, stop and ask.
 
 | Action | GitLab (`glab`) | GitHub (`gh`) |

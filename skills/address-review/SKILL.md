@@ -8,7 +8,11 @@ disable-model-invocation: true
 
 Answer **one** review round posted by `/review-mr`: every finding gets fixed or a reasoned
 decline, then one response comment. "MR" means a GitLab merge request or a GitHub pull
-request; `docs/agents/issue-tracker.md` in the repo says which.
+request.
+
+**Tracker:** if `docs/agents/issue-tracker.md` exists, follow it. Otherwise infer it from
+`git remote get-url origin`: `github.com` means GitHub (`gh`), any other host means GitLab
+(`glab`, authenticated for that host: `glab auth status`). If neither works, stop and ask.
 
 Never merge, never force-push, never rewrite commits the reviewer already saw.
 

@@ -8,7 +8,11 @@ disable-model-invocation: true
 
 Get an approved MR/PR to a green pipeline and hand it to a human. **Merging is always a
 human's decision: never merge, never enable auto-merge.** "MR" means a GitLab merge
-request or a GitHub pull request; `docs/agents/issue-tracker.md` in the repo says which.
+request or a GitHub pull request.
+
+**Tracker:** if `docs/agents/issue-tracker.md` exists, follow it. Otherwise infer it from
+`git remote get-url origin`: `github.com` means GitHub (`gh`), any other host means GitLab
+(`glab`, authenticated for that host: `glab auth status`). If neither works, stop and ask.
 
 | Action | GitLab (`glab`) | GitHub (`gh`) |
 |---|---|---|

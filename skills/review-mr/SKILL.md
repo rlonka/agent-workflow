@@ -9,7 +9,11 @@ disable-model-invocation: true
 Post **one** review round on an MR/PR opened by `/implement-issue`. The round count, the
 verdict and the limit live in the MR itself (hidden markers in comments), so any agent
 in any session reaches the same conclusion. "MR" means a GitLab merge request or a GitHub
-pull request; `docs/agents/issue-tracker.md` in the repo says which.
+pull request.
+
+**Tracker:** if `docs/agents/issue-tracker.md` exists, follow it. Otherwise infer it from
+`git remote get-url origin`: `github.com` means GitHub (`gh`), any other host means GitLab
+(`glab`, authenticated for that host: `glab auth status`). If neither works, stop and ask.
 
 You review; you don't fix. Never push to the MR branch, never merge, never approve through
 the platform's approval button: the verdict is the comment and the label.
