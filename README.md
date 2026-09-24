@@ -82,6 +82,22 @@ npx skills add rlonka/agent-workflow -g
 `gh` or `glab` must be authenticated for the repository's host. Install the `wf-*`
 aliases together with the skills they point to.
 
+### OpenCode
+
+OpenCode loads skills through its `skill` tool but never lists them as slash commands.
+For `/plan-to-issues`, `/wf-plan` and the rest in its command menu, copy the command
+files:
+
+```bash
+git clone https://github.com/rlonka/agent-workflow.git /tmp/agent-workflow
+mkdir -p ~/.config/opencode/commands
+cp /tmp/agent-workflow/opencode/commands/*.md ~/.config/opencode/commands/
+```
+
+OpenCode ignores `disable-model-invocation`, so its agent may also load these skills on
+its own. To be asked first, set `"permission": {"skill": {"*": "allow", "plan-to-issues": "ask", ...}}`
+in `opencode.json`.
+
 ## Credits and license
 
 The planning, domain-docs, test-first and two-axis review methods are adapted from
