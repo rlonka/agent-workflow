@@ -6,24 +6,27 @@ reviews, the loop is capped at a fixed number of rounds, and **merging stays wit
 
 ```
 PLAN                     IMPLEMENT                 REVIEW LOOP (max 3 rounds)          FINISH
-plan mode                /implement-issue #12      /review-mr !34      ← agent B       /await-ci !34
-  → /to-prd (optional)     branch, TDD, tests,       findings + verdict                  waits for the pipeline
-  → ADRs: /domain-modeling commit, push,           /address-review !34 ← agent A         green → ready-to-merge
-  → /to-issues             MR "Closes #12"           fix or decline, push                MERGE = HUMAN
-                                                   limit reached → needs-human
+/grill-to-issues         /implement-issue #12      /review-mr !34      ← agent B       /await-ci !34
+  interview, glossary,     branch, TDD, tests,       findings + verdict                  waits for the pipeline
+  ADRs → docs MR           commit, push,           /address-review !34 ← agent A         green → ready-to-merge
+  PRD (optional)           MR "Closes #12"           fix or decline, push                MERGE = HUMAN
+  issues                                           limit reached → needs-human
 ```
 
 ## Skills
 
 | Skill | Run by | What it does |
 |---|---|---|
+| [`grill-to-issues`](skills/grill-to-issues/SKILL.md) | you + any agent | Interview in rounds, write glossary and ADRs, open a docs MR, optional PRD, publish issues |
 | [`implement-issue`](skills/implement-issue/SKILL.md) | implementer (agent A) | Issue → branch → test-first implementation → checks → commit, push → MR that closes the issue |
 | [`review-mr`](skills/review-mr/SKILL.md) | reviewer (agent B) | One review round: spec and standards, findings with IDs and severities, verdict |
 | [`address-review`](skills/address-review/SKILL.md) | implementer (agent A) | Fix or decline each finding with a reason, push, respond |
 | [`await-ci`](skills/await-ci/SKILL.md) | implementer (agent A) | Wait for the pipeline; green → `ready-to-merge`; red → fix, at most 2 attempts |
 
-The planning steps use existing skills from [mattpocock/skills](https://github.com/mattpocock/skills):
-`to-prd`, `to-issues`, `tdd`, `review` and `domain-modeling` (ADRs and the domain glossary).
+These skills build on [mattpocock/skills](https://github.com/mattpocock/skills):
+`grill-to-issues` chains `grilling`, `domain-modeling`, `to-prd` and `to-issues`;
+`implement-issue` uses `tdd`; `review-mr` follows `review`. For a small, clear task,
+skip the planning step and write the issue yourself.
 
 Every skill runs only when you invoke it, and you run each step yourself, typically
 alternating between two tools (e.g. Claude Code implements, Codex reviews). The loop is
@@ -62,8 +65,8 @@ The skills never merge, but an instruction is not a guarantee. Two more layers:
 
 ```bash
 npx skills add rlonka/agent-workflow -g
-npx skills add mattpocock/skills -g     # to-prd, to-issues, tdd, review, domain-modeling,
-                                        # setup-matt-pocock-skills
+npx skills add mattpocock/skills -g     # grilling, domain-modeling, to-prd, to-issues,
+                                        # tdd, review, setup-matt-pocock-skills
 ```
 
 Once per repository, run `/setup-matt-pocock-skills`. It writes
