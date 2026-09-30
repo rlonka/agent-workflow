@@ -63,7 +63,9 @@ can follow every standard and still implement the wrong thing, or the reverse:
 
 - **Spec:** is every acceptance criterion met? Anything missing, wrong, or not asked for?
 - **Standards:** does the code follow the repo's documented conventions? Skip anything a
-  formatter or linter enforces.
+  formatter or linter enforces. If the project has a `CHANGELOG.md`, the MR must add one
+  short line under `[Unreleased]`, under the matching heading; a missing entry, an entry
+  in the wrong place, or one longer than a short line is a finding.
 
 Every finding gets an ID `R<r>.<k>`, a severity and a location:
 

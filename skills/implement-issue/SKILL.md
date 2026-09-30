@@ -65,6 +65,12 @@ acceptance criterion; if one can't be met, stop and tell the user why.
 
 ### 6. Commit and push
 
+If the project has a `CHANGELOG.md`, add one short line for this change under
+`[Unreleased]`, under the matching [Keep a Changelog](https://keepachangelog.com/) heading
+(Added, Changed, Fixed or Removed), in the file's existing style and without an issue
+reference. This applies to every MR, with no exceptions: an internal-only change goes
+under a fitting heading such as Changed. Skip this if the project has no changelog.
+
 Commit using the repo's commit convention (Conventional Commits unless the repo says
 otherwise), referencing the issue (`owner/project#n` if the issues live in another
 project). Push the branch: `git push -u origin <branch>`.
@@ -78,7 +84,7 @@ the default branch. Description template:
 Closes #<n>   (or Closes <owner/project>#<n> if the issues live in another project)
 
 ## What changed
-<2-5 bullets>
+<2-5 bullets; note the CHANGELOG entry, if the project has a changelog>
 
 ## How it was verified
 <test commands run and their result; acceptance criteria checklist, all ticked>

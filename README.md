@@ -19,8 +19,8 @@ PLAN                     IMPLEMENT                 REVIEW LOOP (max 3 rounds)   
 | Skill | Alias | Run by | What it does |
 |---|---|---|---|
 | [`plan-to-issues`](skills/plan-to-issues/SKILL.md) | `wf-plan` | you + any agent | Interview in rounds, write glossary and ADRs, open a docs MR, optional PRD, publish issues |
-| [`implement-issue`](skills/implement-issue/SKILL.md) | `wf-implement` | implementer (agent A) | Issue → branch → test-first implementation → checks → commit, push → MR that closes the issue |
-| [`review-mr`](skills/review-mr/SKILL.md) | `wf-review` | reviewer (agent B) | One review round: spec and standards, findings with IDs and severities, verdict |
+| [`implement-issue`](skills/implement-issue/SKILL.md) | `wf-implement` | implementer (agent A) | Issue → branch → test-first implementation → checks → `CHANGELOG.md` entry → commit, push → MR that closes the issue |
+| [`review-mr`](skills/review-mr/SKILL.md) | `wf-review` | reviewer (agent B) | One review round: spec and standards (including the `CHANGELOG.md` entry), findings with IDs and severities, verdict |
 | [`address-review`](skills/address-review/SKILL.md) | `wf-respond` | implementer (agent A) | Fix or decline each finding with a reason, push, respond |
 | [`await-ci`](skills/await-ci/SKILL.md) | `wf-ship` | implementer (agent A) | Wait for the pipeline; green → `ready-to-merge`; red → fix, at most 2 attempts |
 | [`domain-docs`](skills/domain-docs/SKILL.md) | `wf-domain` | you + any agent | Work on the glossary (`CONTEXT.md`) and ADRs without planning issues |
