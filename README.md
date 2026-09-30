@@ -98,6 +98,19 @@ OpenCode ignores `disable-model-invocation`, so its agent may also load these sk
 its own. To be asked first, set `"permission": {"skill": {"*": "allow", "plan-to-issues": "ask", ...}}`
 in `opencode.json`.
 
+## Development
+
+`scripts/check.sh` verifies that the skills fit together: every `skills/<name>/SKILL.md`
+has a `name` matching its folder and a `description`, every `wf-*` alias points to an
+existing skill, and every skill has an `opencode/commands/<name>.md`. Run it from
+anywhere in a clone (needs only `git`, `grep` and `sed`):
+
+```bash
+scripts/check.sh
+```
+
+CI runs it on every pull request and on push to `main`.
+
 ## Credits and license
 
 The planning, domain-docs, test-first and two-axis review methods are adapted from
