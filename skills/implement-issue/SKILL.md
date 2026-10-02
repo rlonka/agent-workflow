@@ -65,6 +65,12 @@ acceptance criterion; if one can't be met, stop and tell the user why.
 
 ### 6. Commit and push
 
+If the repo keeps a changelog — a changelog file at its root (`CHANGELOG`, `CHANGES` or
+`HISTORY`, any extension) or a fragment directory documented in `AGENTS.md` or
+`CONTRIBUTING.md` — add one entry describing the change, following the changelog's
+existing format (for Keep a Changelog, the `Unreleased` section under the fitting
+category), in the same commit as the code. Repos without a changelog are unaffected.
+
 Commit using the repo's commit convention (Conventional Commits unless the repo says
 otherwise), referencing the issue (`owner/project#n` if the issues live in another
 project). Push the branch: `git push -u origin <branch>`.
